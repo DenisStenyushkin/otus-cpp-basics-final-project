@@ -1,9 +1,13 @@
 {
   "name": "CUDA_cpp_python",
   "image": "nvidia/cuda:12.1.0-devel-ubuntu22.04", 
-  "runArgs": [
-    "--gpus=all"
-  ],
+  "containerEnv": {
+        "DISPLAY": "unix:0"
+    },
+    "mounts": [
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+      ],
+  "runArgs": ["--privileged", "--gpus=all"],
   "remoteEnv": {
     "PATH": "${containerEnv:PATH}:/usr/local/cuda/bin",
     "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64",

@@ -10,7 +10,14 @@
 #include "inference.h"
 
 
-int main(int argc, char* argv[]) {
+struct Arguments {
+    bool isCorrect;
+    std::string sourceFname;
+    std::string detectorFname;
+    bool runOnGPU;
+};
+
+Arguments parseArguments(int argc, char* argv[]) {
     const std::string arg_keys = 
         "{help h usage ? || print this message}"
         "{@sourceFname   || path to source video file}"
@@ -18,29 +25,38 @@ int main(int argc, char* argv[]) {
         "{gpu            || use gpu}";
     cv::CommandLineParser cl_parser(argc, argv, arg_keys);
 
-    if (cl_parser.has("help")) {
-        cl_parser.printMessage();
-        return 0;
-    }
-
+    bool isCorrect{ true };
     std::string sourceFname{ cl_parser.get<std::string>("@sourceFname") };
     std::string detectorFname{ cl_parser.get<std::string>("@detectorFname") };
     bool runOnGPU{ cl_parser.has("gpu") };
 
-    if (sourceFname.empty() || detectorFname.empty()) {
+    if (cl_parser.has("help") || sourceFname.empty() || detectorFname.empty()) {
         cl_parser.printMessage();
+        isCorrect = false;
+    }
+
+    Arguments args {
+        isCorrect, sourceFname, detectorFname, runOnGPU
+    };
+
+    return args;
+}
+
+
+int main(int argc, char* argv[]) {
+    Arguments args = parseArguments(argc, argv);
+    if (!args.isCorrect) {
         return 0;
     }
 
-    cv::VideoCapture cap{sourceFname};
+    cv::VideoCapture cap{args.sourceFname};
     if (!cap.isOpened()) {
         std::cerr << "Unable to open video source.\n";
         return -1;
     }
-
     
-    std::size_t pAt = sourceFname.find_last_of('.');
-    const std::string outFname = sourceFname.substr(0, pAt) + "_dets.avi";
+    std::size_t pAt = args.sourceFname.find_last_of('.');
+    const std::string outFname = args.sourceFname.substr(0, pAt) + "_dets.avi";
     int ex = static_cast<int>(cap.get(cv::CAP_PROP_FOURCC));
     cv::Size s{static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH)),
                static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT))};
@@ -51,7 +67,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    Inference inf{detectorFname, cv::Size{640, 640}, "", runOnGPU};
+    Inference inf{args.detectorFname, cv::Size{640, 640}, "", args.runOnGPU};
 
     cv::Mat frame;
     while (true) {

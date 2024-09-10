@@ -4,10 +4,11 @@
 #include <vector>
 
 #include "opencv2/core.hpp"
-#include "opencv2/videoio.hpp"
 #include "opencv2/highgui.hpp"
 
 #include "inference.h"
+#include "videocapturewrapper.hpp"
+#include "videowriterwrapper.hpp"
 
 
 struct Arguments {
@@ -49,11 +50,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    cv::VideoCapture cap{args.sourceFname};
-    if (!cap.isOpened()) {
-        std::cerr << "Unable to open video source.\n";
-        return -1;
-    }
+    VideoCaptureWrapper cap{args.sourceFname};
     
     std::size_t pAt = args.sourceFname.find_last_of('.');
     const std::string outFname = args.sourceFname.substr(0, pAt) + "_dets.avi";
@@ -61,12 +58,8 @@ int main(int argc, char* argv[]) {
     cv::Size s{static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH)),
                static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT))};
     double fps{cap.get(cv::CAP_PROP_FPS)};
-    cv::VideoWriter out{outFname, ex, fps, s, true};
-    if (!out.isOpened()) {
-        std::cerr << "Could not open out stream.\n";
-        return -1;
-    }
 
+    VideoWriterWrapper out{outFname, ex, fps, s};
     Inference inf{args.detectorFname, cv::Size{640, 640}, "", args.runOnGPU};
 
     cv::Mat frame;
@@ -91,7 +84,4 @@ int main(int argc, char* argv[]) {
 
         out << frame;
     }
-    
-    cap.release();
-    out.release();
 }

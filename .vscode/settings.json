@@ -1,0 +1,9 @@
+{
+    "cmake.debugConfig": {
+        "args": [
+            "../3.mp4",
+            "../weights/yolov8n.onnx",
+            "--gpu"
+        ]
+    }
+}

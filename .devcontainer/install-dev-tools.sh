@@ -11,6 +11,7 @@ apt-get update -qq && apt-get -y install \
   autoconf \
   automake \
   build-essential \
+  gdb \
   cmake \
   git-core \
   libass-dev \
@@ -41,7 +42,8 @@ apt-get update -qq && apt-get -y install \
   libopus-dev \
   libdav1d-dev \
   libgtk2.0-dev \
-  libcanberra-gtk-module
+  libcanberra-gtk-module \
+  libeigen3-dev
 
 # update CUDA Linux GPG repository key
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb

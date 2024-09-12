@@ -5,11 +5,12 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_subdirectory(src/yolo)
+add_subdirectory(src/sort)
 
 
 add_executable(main src/main.cpp)
-target_include_directories(main PUBLIC src/yolo)
-target_link_libraries(main PUBLIC ${OpenCV_LIBS} yolo)
+target_include_directories(main PUBLIC src/yolo src/sort)
+target_link_libraries(main PUBLIC ${OpenCV_LIBS} yolo sort)
 
 set_target_properties(main 
                       PROPERTIES CXX_STANDARD 17 

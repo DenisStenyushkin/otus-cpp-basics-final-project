@@ -6,6 +6,7 @@
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"
 
+#include "colorsdispatcher.hpp"
 #include "inference.h"
 #include "tracker.h"
 #include "videocapturewrapper.hpp"
@@ -66,6 +67,7 @@ int main(int argc, char* argv[]) {
 
     cv::Mat frame;
     int frameIdx {0};
+    ColorsDispatcher colors;
     while (true) {
         cap >> frame;
         if (frame.empty()) break;
@@ -78,14 +80,6 @@ int main(int argc, char* argv[]) {
             
             cv::Rect& box = detection.box;
             bboxes.push_back(box);
-            // cv::Scalar& color = detection.color;
-            // cv::rectangle(frame, box, color, 2);
-
-            // cv::Size textSize = cv::getTextSize(detection.className, cv::FONT_HERSHEY_DUPLEX, 1, 2, 0);
-            // cv::Rect textBox{box.x, box.y - 40, textSize.width + 10, textSize.height + 20};
-            // cv::rectangle(frame, textBox, color, cv::FILLED);
-            // cv::putText(frame, detection.className, cv::Point{box.x + 5, box.y - 10},
-            //             cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar{0, 0, 0}, 2, 0);
         }
 
         tracker.Run(bboxes);
@@ -95,9 +89,10 @@ int main(int argc, char* argv[]) {
             if (track.coast_cycles_ < kMaxCoastCycles &&
                 (track.hit_streak_ >= kMinHits || frameIdx < kMinHits)) {
                     const cv::Rect bbox = track.GetStateAsBbox();
+                    cv::Scalar color = colors.getColor(trackId);
                     cv::putText(frame, std::to_string(trackId), cv::Point(bbox.tl().x, bbox.tl().y-10),
-                                cv::FONT_HERSHEY_DUPLEX, 2, cv::Scalar(255, 255, 255), 3);
-                    cv::rectangle(frame, bbox, cv::Scalar(255, 255, 255), 3);
+                                cv::FONT_HERSHEY_DUPLEX, 2, color, 3);
+                    cv::rectangle(frame, bbox, color, 3);
                 }
         }
 

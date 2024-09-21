@@ -17,9 +17,7 @@ public:
         }
 
         if (colorIdx > m_colors.size()) {
-            m_colors.push_back(cv::Scalar(m_distr(m_rg),
-                                          m_distr(m_rg),
-                                          m_distr(m_rg)));
+            m_colors.emplace_back(m_distr(m_rg), m_distr(m_rg), m_distr(m_rg));
         }
 
         return m_colors[colorIdx];

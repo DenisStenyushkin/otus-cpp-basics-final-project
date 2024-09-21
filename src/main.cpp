@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -74,13 +75,9 @@ int main(int argc, char* argv[]) {
         ++frameIdx;
 
         std::vector<Detection> output = inf.runInference(frame);
-        std::vector<cv::Rect> bboxes;
-        for (size_t i = 0; i < output.size(); ++i) {
-            Detection& detection = output[i];
-            
-            cv::Rect& box = detection.box;
-            bboxes.push_back(box);
-        }
+        std::vector<cv::Rect> bboxes{output.size()};
+        std::transform(output.cbegin(), output.cend(), bboxes.begin(),
+                       [](const Detection& detection) { return detection.box; });
 
         tracker.Run(bboxes);
         const auto tracks = tracker.GetTracks();

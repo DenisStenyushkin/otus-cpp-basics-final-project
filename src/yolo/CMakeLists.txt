@@ -4,9 +4,7 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # CUDA
-set(CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda")
-find_package(CUDA 12 REQUIRED)
-
+find_package(CUDA 12)
 set(CMAKE_CUDA_STANDARD 12)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 # !CUDA
